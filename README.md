@@ -33,4 +33,4 @@ A high-performance, real-time Computer Vision system that detects facial express
 1. *Clone the Repository:*
    ```bash
    git clone [https://github.com/balaji-ai2006/realtime-Emotion-Detection.git](https://github.com/balaji-ai2006/realtime-Emotion-Detection.git)
-   cd realtime-Emotion-Detection
+   cd realtime-Emotion-Detection.
