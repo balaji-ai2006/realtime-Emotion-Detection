@@ -4,6 +4,14 @@ A high-performance, real-time Computer Vision system designed to run on the **We
 
 ---
 
+## 🌐 Live Web Demo
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://realtime-emotion-detection-gemude956oggvwyj25huee.streamlit.app)
+
+👉 **Try it Live here:** [https://realtime-emotion-detection-gemude956oggvwyj25huee.streamlit.app](https://realtime-emotion-detection-gemude956oggvwyj25huee.streamlit.app)
+
+---
+
 ## 🌟 Key Features & Optimizations
 
 * **🌐 Interactive Streamlit Web App:**
@@ -35,24 +43,6 @@ A high-performance, real-time Computer Vision system designed to run on the **We
   * `psutil`
   * `av`
   * `Pillow`
-
----
-
-## ☁️ How to Deploy to Streamlit Cloud (100% Free)
-
-1. Make sure your latest code is pushed to your GitHub repository:
-   ```bash
-   git add .
-   git commit -m "Deploy Streamlit Web App"
-   git push origin main
-   ```
-2. Go to **[share.streamlit.io](https://share.streamlit.io)** and log in with your GitHub account.
-3. Click **"New app"** (or "Create app").
-4. Select your repository: `balaji-ai2006/realtime-Emotion-Detection`
-5. Branch: `main`
-6. Main file path: `app.py`
-7. Click **"Deploy!"**
-8. Within 1–2 minutes, your live web app link (`https://<your-app-name>.streamlit.app`) will be active and accessible from any phone or PC!
 
 ---
 
