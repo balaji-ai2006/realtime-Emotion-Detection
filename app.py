@@ -3,12 +3,12 @@ import cv2
 import numpy as np
 import streamlit as st
 import psutil
-from collections import deque, Counter
 from PIL import Image
 
-# Check if streamlit_webrtc is available
+# Check if streamlit_webrtc and av are available
 try:
-    from streamlit_webrtc import webrtc_streamer, VideoTransformerBase, RTCConfiguration, WebRtcMode
+    import av
+    from streamlit_webrtc import webrtc_streamer, RTCConfiguration, WebRtcMode
     HAS_WEBRTC = True
 except ImportError:
     HAS_WEBRTC = False
@@ -59,13 +59,20 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# Cache Haar Cascade Classifier
+# Cache Haar Cascade Classifier with safe path resolution
 @st.cache_resource
 def load_cascade():
-    xml_file = "haarcascade_frontalface_default.xml"
-    if not os.path.exists(xml_file):
-        xml_file = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
-    return cv2.CascadeClassifier(xml_file)
+    base_dir = os.path.dirname(os.path.abspath(__file__))
+    local_xml = os.path.join(base_dir, "haarcascade_frontalface_default.xml")
+    if os.path.exists(local_xml):
+        cascade_path = local_xml
+    else:
+        cascade_path = os.path.join(cv2.data.haarcascades, "haarcascade_frontalface_default.xml")
+    
+    cascade = cv2.CascadeClassifier(cascade_path)
+    if cascade.empty():
+        st.error(f"Failed to load Haar Cascade from: {cascade_path}")
+    return cascade
 
 face_cascade = load_cascade()
 clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
@@ -211,21 +218,21 @@ st.markdown("Computer Vision system with facial tracking, edge-variance profilin
 # App Modes
 if mode == "📹 Live WebRTC Camera":
     if not HAS_WEBRTC:
-        st.warning("⚠️ `streamlit-webrtc` सापडले नाही. कृपया '📸 Snapshot Camera' पर्याय निवडा किंवा `pip install streamlit-webrtc` रन करा.")
+        st.warning("⚠️ `streamlit-webrtc` is not installed or unavailable. Please switch to '📸 Snapshot Camera' mode.")
     else:
-        st.info("💡 **टीप:** कॅमेरा सुरू करण्यासाठी खालील 'START' बटनावर क्लिक करा आणि ब्राउझरमध्ये Camera Permission अलाऊ (Allow) करा.")
+        st.info("💡 **टीप:** कॅमेरा सुरू करण्यासाठी खालील **START** बटनावर क्लिक करा आणि ब्राउझरमध्ये **Camera Permission Allow** करा.")
 
-        class EmotionVideoTransformer(VideoTransformerBase):
-            def __init__(self):
-                self.history = deque(maxlen=7)
-
-            def transform(self, frame):
-                img = frame.to_ndarray(format="bgr24")
-                rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-                processed_rgb, faces = process_frame(
-                    rgb, happy_thr=happy_thr, tension_thr=tension_thr, thinking_thr=thinking_thr
+        def video_frame_callback(frame):
+            try:
+                img_bgr = frame.to_ndarray(format="bgr24")
+                img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+                processed_rgb, _ = process_frame(
+                    img_rgb, happy_thr=happy_thr, tension_thr=tension_thr, thinking_thr=thinking_thr
                 )
-                return cv2.cvtColor(processed_rgb, cv2.COLOR_RGB2BGR)
+                processed_bgr = cv2.cvtColor(processed_rgb, cv2.COLOR_RGB2BGR)
+                return av.VideoFrame.from_ndarray(processed_bgr, format="bgr24")
+            except Exception as e:
+                return frame
 
         # STUN Server configuration for robust cloud streaming
         rtc_config = RTCConfiguration({
@@ -236,9 +243,9 @@ if mode == "📹 Live WebRTC Camera":
             key="emotion-detection-live",
             mode=WebRtcMode.SENDRECV,
             rtc_configuration=rtc_config,
-            video_transformer_factory=EmotionVideoTransformer,
+            video_frame_callback=video_frame_callback,
             media_stream_constraints={"video": True, "audio": False},
-            async_transform=True
+            async_processing=True
         )
 
 elif mode == "📸 Snapshot Camera":
