@@ -1,71 +1,83 @@
-# Real-Time Emotion Detection Engine (PC & Raspberry Pi Optimized) 🚀
+# Real-Time Emotion Detection Engine (Web, PC & Raspberry Pi) 🚀
 
-A lightweight, real-time Computer Vision system designed to run smoothly on both **Desktop PCs** and low-power **Raspberry Pi** boards (Raspberry Pi 3, 4, 5, Zero 2W).
+A high-performance, real-time Computer Vision system designed to run on the **Web (Streamlit Cloud)**, **Desktop PCs**, and low-power **Raspberry Pi** boards (Raspberry Pi 3, 4, 5, Zero 2W).
 
 ---
 
 ## 🌟 Key Features & Optimizations
 
-* **Raspberry Pi Ultra-Fast Engine:**
+* **🌐 Interactive Streamlit Web App:**
+  * **Live WebRTC Camera:** Real-time video stream right inside any web browser.
+  * **Snapshot Camera:** Instant photo capture & facial dynamics analysis.
+  * **Image Upload:** Upload pictures to inspect ROI variance and eyebrow/mouth metrics.
+  * **Dynamic Sensitivity Sliders:** Adjust emotion thresholds live in the browser.
+* **🍓 Raspberry Pi Ultra-Fast Engine:**
   * Uses downscaled grayscale processing (`--scale 0.5`) for Haar Cascade detection, achieving **25–30+ FPS** on Raspberry Pi.
   * Default resolution optimized to **640x480** to minimize CPU and RAM overhead.
-* **Illumination-Invariant Facial Analysis:**
+* **💡 Illumination-Invariant Facial Analysis:**
   * Uses **CLAHE (Contrast Limited Adaptive Histogram Equalization)** on facial ROIs, making emotion detection robust against shadows and uneven lighting.
-* **Temporal Emotion Smoothing:**
+* **🎯 Temporal Emotion Smoothing:**
   * Built-in frame buffer (`deque`) removes jitter and prevents flickering between emotions.
-* **Dynamic Bounding Box & UI Overlay:**
+* **📊 Dynamic Bounding Box & UI Overlay:**
   * Smart label rendering prevents clipping at screen borders.
   * Real-time metrics dashboard: **FPS, CPU Usage, Face Count**.
-* **Headless Mode Support:**
-  * Run remotely on Raspberry Pi via SSH without an attached display using `--headless`.
 
 ---
 
 ## 🛠️ Requirements & Tech Stack
 
-* **Language:** Python 3.7+
+* **Language:** Python 3.8+
 * **Dependencies:**
-  * `opencv-python`
+  * `streamlit`
+  * `streamlit-webrtc`
+  * `opencv-python-headless` (or `opencv-python`)
   * `numpy`
   * `psutil`
+  * `av`
+  * `Pillow`
 
 ---
 
-## 💻 Installation & Quick Start
+## ☁️ How to Deploy to Streamlit Cloud (100% Free)
 
-### 1. On Windows / Linux / macOS (PC)
+1. Make sure your latest code is pushed to your GitHub repository:
+   ```bash
+   git add .
+   git commit -m "Deploy Streamlit Web App"
+   git push origin main
+   ```
+2. Go to **[share.streamlit.io](https://share.streamlit.io)** and log in with your GitHub account.
+3. Click **"New app"** (or "Create app").
+4. Select your repository: `balaji-ai2006/realtime-Emotion-Detection`
+5. Branch: `main`
+6. Main file path: `app.py`
+7. Click **"Deploy!"**
+8. Within 1–2 minutes, your live web app link (`https://<your-app-name>.streamlit.app`) will be active and accessible from any phone or PC!
 
+---
+
+## 💻 Local Quick Start
+
+### 1. Run the Web Application locally:
 ```bash
-# Clone the repository
-git clone https://github.com/balaji-ai2006/realtime-Emotion-Detection.git
-cd realtime-Emotion-Detection
-
-# Install dependencies
-pip install -r requirements.txt
-
-# Run the detection engine
-python main.py
+streamlit run app.py
 ```
 
-### 2. On Raspberry Pi (Raspberry Pi OS)
-
+### 2. Run Desktop/Raspberry Pi Engine:
 ```bash
-# 1. Update system packages
-sudo apt update && sudo apt install -y python3-opencv python3-numpy python3-psutil
+# On PC:
+python main.py
 
-# 2. Navigate to project folder
-cd realtime-Emotion-Detection
-
-# 3. Run the application
+# On Raspberry Pi:
 python3 main.py
 
-# Optional: Run in headless mode (if connected via SSH without a monitor)
+# Headless on Raspberry Pi (via SSH without monitor):
 python3 main.py --headless
 ```
 
 ---
 
-## ⚙️ CLI Options & Arguments
+## ⚙️ CLI Options for `main.py`
 
 | Argument | Default | Description |
 | :--- | :--- | :--- |
@@ -74,8 +86,3 @@ python3 main.py --headless
 | `--height` | `480` | Video frame height (480 recommended for Raspberry Pi) |
 | `--scale` | `0.5` | Detection scale factor (downscales frame for 4x faster detection) |
 | `--headless`| `False` | Run in background/terminal without opening a GUI window |
-
----
-
-## 🎮 Exit the Program
-* Press **`q`** inside the camera window or **`Ctrl + C`** in your terminal.
